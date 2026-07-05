@@ -1,10 +1,6 @@
 # DocIntel
 
-<!--
-  Replace <owner>/<repo> below once this repository is pushed to GitHub —
-  the badge won't resolve until the workflow has run at least once there.
--->
-[![Tests](https://github.com/<owner>/<repo>/actions/workflows/tests.yml/badge.svg)](https://github.com/<owner>/<repo>/actions/workflows/tests.yml)
+[![Tests](https://github.com/suyashisingh/DocIntel/actions/workflows/tests.yml/badge.svg)](https://github.com/suyashisingh/DocIntel/actions/workflows/tests.yml)
 
 AI-powered document intelligence platform with multi-tenant organization support — upload documents, extract structured data via OCR/NLP/ML, search across content and tables, and chat with your documents using retrieval-augmented generation.
 
