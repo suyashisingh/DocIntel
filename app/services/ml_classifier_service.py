@@ -26,10 +26,13 @@ class MLDocumentClassifier:
     """
 
     def __init__(self):
-        self._pipeline = pipeline(
-            "zero-shot-classification",
-            model=settings.ZERO_SHOT_MODEL,
-        )
+        if settings.USE_ZERO_SHOT_CLASSIFIER:
+            self._pipeline = pipeline(
+                "zero-shot-classification",
+                model=settings.ZERO_SHOT_MODEL,
+            )
+        else:
+            self._pipeline = None
 
     def predict(self, text: str) -> tuple[str, float]:
         """Classify *text* and return ``(label, confidence)``."""

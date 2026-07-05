@@ -63,6 +63,12 @@ class Settings:
         self.ZERO_SHOT_MODEL: str = os.getenv(
             "ZERO_SHOT_MODEL", "cross-encoder/nli-MiniLM2-L6-H768"
         )
+        # Set to "false" to skip loading the zero-shot cross-encoder (saves
+        # memory on constrained hosts); classification then falls back
+        # straight to the keyword-based DocumentClassifier.
+        self.USE_ZERO_SHOT_CLASSIFIER: bool = os.getenv(
+            "USE_ZERO_SHOT_CLASSIFIER", "true"
+        ).strip().lower() in ("1", "true", "yes")
 
         # HuggingFace Inference API (RAG / Chat)
         self.HF_API_TOKEN: str = os.getenv("HF_API_TOKEN", "")

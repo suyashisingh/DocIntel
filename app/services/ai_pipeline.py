@@ -178,30 +178,44 @@ def process_document(document_id: int):
             logger.info("Document %d: NLP complete, found %d entities", document_id, len(entities))
             _publish(r, document_id, "processing", 55, "Extracting entities…")
 
-            logger.info("Document %d: starting zero-shot classification", document_id)
-            doc_type, ml_confidence = zero_shot_classifier.predict(text_data)
-            logger.info(
-                "Document %d: zero-shot → '%s' (score=%.3f)",
-                document_id, doc_type, ml_confidence,
-            )
-            _publish(r, document_id, "processing", 75, "Classifying document…")
-
-            # Fall back to keyword classifier when zero-shot confidence is low.
-            if ml_confidence < FALLBACK_CONFIDENCE_THRESHOLD:
-                fallback_type = keyword_classifier.detect(text_data)
+            if not settings.USE_ZERO_SHOT_CLASSIFIER:
                 logger.info(
-                    "Document %d: zero-shot confidence %.3f < %.2f threshold, "
-                    "keyword fallback → '%s'",
-                    document_id, ml_confidence, FALLBACK_CONFIDENCE_THRESHOLD, fallback_type,
+                    "Document %d: zero-shot classifier disabled (USE_ZERO_SHOT_CLASSIFIER=false), "
+                    "using keyword classifier",
+                    document_id,
                 )
-                doc_type = fallback_type
-                # Cap ml_confidence just below the threshold so the stored
-                # confidence score honestly reflects a keyword-fallback result,
-                # not a confident zero-shot prediction.
+                doc_type = keyword_classifier.detect(text_data)
+                # Same capped value the keyword-fallback path below uses, so
+                # the stored confidence score honestly reflects a
+                # keyword-only result rather than a zero-shot prediction.
                 ml_confidence = FALLBACK_CONFIDENCE_THRESHOLD - 0.01
                 classification_method = "keyword_fallback"
+                _publish(r, document_id, "processing", 75, "Classifying document…")
             else:
-                classification_method = "zero_shot"
+                logger.info("Document %d: starting zero-shot classification", document_id)
+                doc_type, ml_confidence = zero_shot_classifier.predict(text_data)
+                logger.info(
+                    "Document %d: zero-shot → '%s' (score=%.3f)",
+                    document_id, doc_type, ml_confidence,
+                )
+                _publish(r, document_id, "processing", 75, "Classifying document…")
+
+                # Fall back to keyword classifier when zero-shot confidence is low.
+                if ml_confidence < FALLBACK_CONFIDENCE_THRESHOLD:
+                    fallback_type = keyword_classifier.detect(text_data)
+                    logger.info(
+                        "Document %d: zero-shot confidence %.3f < %.2f threshold, "
+                        "keyword fallback → '%s'",
+                        document_id, ml_confidence, FALLBACK_CONFIDENCE_THRESHOLD, fallback_type,
+                    )
+                    doc_type = fallback_type
+                    # Cap ml_confidence just below the threshold so the stored
+                    # confidence score honestly reflects a keyword-fallback result,
+                    # not a confident zero-shot prediction.
+                    ml_confidence = FALLBACK_CONFIDENCE_THRESHOLD - 0.01
+                    classification_method = "keyword_fallback"
+                else:
+                    classification_method = "zero_shot"
 
         confidence = compute_confidence(text_data, entities, ml_confidence)
         logger.info("Document %d: confidence score %.4f", document_id, confidence)
