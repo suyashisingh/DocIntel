@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, field_validator
 
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Query, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, UploadFile, File, HTTPException, Query, Response
 from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, text
@@ -32,6 +32,7 @@ from app.services.audit_service import log_audit
 from app.pii_detector import detect_pii, redact_text as _redact_text
 
 from app.tasks import process_document_task
+from app.utils.task_dispatch import dispatch_task
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 logger = logging.getLogger(__name__)
@@ -572,6 +573,7 @@ def get_qa_history(
 def reprocess_document(
     org_id: int,
     document_id: int,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     actor: OrganizationUser = Depends(require_role(OrgRole.ADMIN, OrgRole.ANALYST)),
 ):
@@ -591,7 +593,7 @@ def reprocess_document(
     document.status = DocumentStatus.queued
     db.commit()
 
-    process_document_task.delay(document_id)
+    dispatch_task(process_document_task, background_tasks, document_id)
 
     logger.info(
         "Reprocess queued: document_id=%d org_id=%d by user_id=%d",
@@ -663,6 +665,7 @@ def bulk_delete_documents(
 @router.post("/bulk-reprocess")
 def bulk_reprocess_documents(
     body: BulkIdsRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     actor: OrganizationUser = Depends(require_role(OrgRole.ADMIN, OrgRole.ANALYST)),
 ):
@@ -676,7 +679,7 @@ def bulk_reprocess_documents(
         if not doc or doc.status == DocumentStatus.processing:
             continue
         doc.status = DocumentStatus.queued
-        process_document_task.delay(doc_id)
+        dispatch_task(process_document_task, background_tasks, doc_id)
         queued += 1
 
     db.commit()
@@ -770,6 +773,7 @@ def bulk_export_documents(
 @router.post("/{org_id}/upload", response_model=list[DocumentResponse])
 def upload_document(
     org_id: int,
+    background_tasks: BackgroundTasks,
     files: list[UploadFile] = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -794,7 +798,7 @@ def upload_document(
                 db.add(new_document)
                 db.commit()
                 db.refresh(new_document)
-                process_document_task.delay(new_document.id)
+                dispatch_task(process_document_task, background_tasks, new_document.id)
                 logger.info(
                     "ZIP member uploaded: id=%d org_id=%d user_id=%d filename=%r",
                     new_document.id, org_id, current_user.id, original_name,
@@ -827,7 +831,7 @@ def upload_document(
             db.add(new_document)
             db.commit()
             db.refresh(new_document)
-            process_document_task.delay(new_document.id)
+            dispatch_task(process_document_task, background_tasks, new_document.id)
             logger.info(
                 "Document uploaded: id=%d org_id=%d user_id=%d filename=%r",
                 new_document.id, org_id, current_user.id, filename,

@@ -3,6 +3,7 @@ import os
 from datetime import datetime, timezone
 
 from app.celery_app import celery_app
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +11,12 @@ logger = logging.getLogger(__name__)
 @celery_app.task(name="app.retention_task.expire_documents")
 def expire_documents():
     """Delete all documents whose expires_at timestamp has passed."""
+    if not settings.USE_CELERY:
+        logger.warning(
+            "Retention checks require Celery Beat and are disabled — USE_CELERY=false"
+        )
+        return {"skipped": True}
+
     from app.database import SessionLocal
     from app.models.document import Document
 

@@ -43,6 +43,13 @@ class Settings:
         # Redis / Celery
         self.CELERY_BROKER_URL: str = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 
+        # Task dispatch — set to "false" on hosts without a standalone Celery
+        # worker (e.g. free-tier hosting); tasks then run in-process via
+        # FastAPI's BackgroundTasks instead of being sent to the broker.
+        self.USE_CELERY: bool = os.getenv("USE_CELERY", "true").strip().lower() in (
+            "1", "true", "yes",
+        )
+
         # OCR
         # Default "tesseract" works on Linux/Docker (binary on PATH).
         # Override with an absolute path on Windows, e.g.:

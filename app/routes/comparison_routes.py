@@ -4,7 +4,7 @@ import logging
 import os
 
 import redis.asyncio as aioredis
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.websockets import WebSocket, WebSocketDisconnect
@@ -17,6 +17,7 @@ from app.models.comparison import Comparison
 from app.models.document import Document
 from app.models.organization_user import OrganizationUser
 from app.models.user import User
+from app.utils.task_dispatch import dispatch_task
 
 router = APIRouter(prefix="/comparisons", tags=["Comparisons"])
 logger = logging.getLogger(__name__)
@@ -47,6 +48,7 @@ def _serialize(c: Comparison) -> dict:
 @router.post("")
 def create_comparison(
     body: CreateComparisonRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -83,7 +85,7 @@ def create_comparison(
     db.commit()
     db.refresh(comparison)
 
-    run_comparison.delay(comparison.id)
+    dispatch_task(run_comparison, background_tasks, comparison.id)
 
     logger.info("Comparison %d created (mode=%s)", comparison.id, body.mode)
     return _serialize(comparison)
