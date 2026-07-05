@@ -1,0 +1,610 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply bg-paper text-ink font-body;
+    background-color: #171412 !important;
+    color: rgba(255,255,255,0.90);
+  }
+  #root {
+    background-color: #171412 !important;
+  }
+
+  /* Noise texture overlay — applied as a pseudo-element on fixed-bg pages */
+  .noise-overlay::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+  }
+}
+
+@layer utilities {
+  .card-hover {
+    @apply transition-all duration-200 ease-out;
+  }
+}
+
+/* Dark scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ── App dark theme overrides ───────────────────────────────────────────
+   Applied inside .app-dark (AppLayout wrapper) to override semantic
+   Tailwind tokens for all inner pages without changing individual files.
+   ─────────────────────────────────────────────────────────────────────── */
+
+.app-dark { background: #171412 !important; }
+
+/* Surfaces */
+.app-dark .bg-surface        { background-color: #3A3430 !important; }
+.app-dark .bg-surface\/40    { background-color: rgba(255,255,255,0.025) !important; }
+.app-dark .bg-paper          { background-color: #0F0D0B !important; }
+.app-dark .bg-paper\/20      { background-color: rgba(255,255,255,0.02) !important; }
+.app-dark .bg-paper\/40      { background-color: rgba(255,255,255,0.03) !important; }
+.app-dark .bg-paper\/60      { background-color: rgba(255,255,255,0.04) !important; }
+.app-dark .bg-paper\/80      { background-color: rgba(255,255,255,0.05) !important; }
+
+/* Ink: maps to accent for buttons, keeps dark for explicit bg */
+.app-dark .bg-ink            { background-color: #E84E2A !important; }
+.app-dark .bg-ink\/5         { background-color: rgba(232,78,42,0.05) !important; }
+.app-dark .bg-ink\/8         { background-color: rgba(232,78,42,0.08) !important; }
+.app-dark .bg-ink\/10        { background-color: rgba(232,78,42,0.1) !important; }
+.app-dark .bg-ink\/20        { background-color: rgba(232,78,42,0.2) !important; }
+.app-dark .hover\:bg-ink\/90:hover { background-color: rgba(220,60,20,0.95) !important; }
+.app-dark .hover\:bg-ink:hover     { background-color: rgba(220,60,20,0.95) !important; }
+
+/* Borders */
+.app-dark .border-border     { border-color: rgba(255,255,255,0.15) !important; }
+.app-dark .border-ink\/10    { border-color: rgba(255,255,255,0.08) !important; }
+.app-dark .border-ink\/20    { border-color: rgba(255,255,255,0.1) !important; }
+.app-dark .divide-border > * + * { border-color: rgba(255,255,255,0.06) !important; }
+
+/* Text */
+.app-dark .text-ink          { color: rgba(255,255,255,0.90) !important; }
+.app-dark .text-ink\/70      { color: rgba(245,242,236,0.7) !important; }
+.app-dark .text-ink\/80      { color: rgba(245,242,236,0.8) !important; }
+.app-dark .text-muted        { color: rgba(255,255,255,0.55) !important; }
+.app-dark .text-muted\/60    { color: rgba(255,255,255,0.28) !important; }
+.app-dark .text-surface      { color: #FFFFFF !important; }
+.app-dark .hover\:text-ink:hover   { color: #F5F2EC !important; }
+.app-dark .hover\:text-ink\/80:hover { color: rgba(245,242,236,0.8) !important; }
+
+/* Hover surfaces */
+.app-dark .hover\:bg-paper:hover   { background-color: rgba(255,255,255,0.05) !important; }
+.app-dark .hover\:bg-paper\/60:hover { background-color: rgba(255,255,255,0.05) !important; }
+.app-dark .hover\:bg-surface:hover { background-color: rgba(255,255,255,0.06) !important; }
+.app-dark .hover\:border-ink\/10:hover { border-color: rgba(232,78,42,0.3) !important; }
+.app-dark .hover\:shadow-float     { box-shadow: 0 0 30px rgba(232,78,42,0.06) !important; }
+
+/* Focus rings */
+.app-dark .focus\:ring-ink\/20:focus { --tw-ring-color: rgba(232,78,42,0.2) !important; }
+
+/* Recharts / chart fill overrides for Analytics */
+.app-dark .recharts-cartesian-axis-tick text { fill: rgba(255,255,255,0.4) !important; }
+.app-dark .recharts-cartesian-grid line { stroke: rgba(255,255,255,0.06) !important; }
+.app-dark .recharts-legend-item-text { color: rgba(255,255,255,0.6) !important; }
+
+/* Misc */
+.app-dark mark { background-color: rgba(232,78,42,0.2) !important; color: #F5F2EC !important; }
+
+/* Emerald (success) */
+.app-dark .bg-emerald-50  { background-color: rgba(34,197,94,0.1) !important; }
+.app-dark .text-emerald-700 { color: #4ade80 !important; }
+.app-dark .text-emerald-600 { color: #4ade80 !important; }
+.app-dark .border-emerald-200 { border-color: rgba(74,222,128,0.25) !important; }
+.app-dark .border-emerald-300 { border-color: rgba(74,222,128,0.35) !important; }
+.app-dark .hover\:bg-emerald-100:hover { background-color: rgba(34,197,94,0.15) !important; }
+.app-dark .hover\:text-emerald-800:hover { color: #86efac !important; }
+
+/* Amber (warning) */
+.app-dark .bg-amber-50   { background-color: rgba(234,179,8,0.1) !important; }
+.app-dark .text-amber-700 { color: #facc15 !important; }
+.app-dark .text-amber-600 { color: #facc15 !important; }
+.app-dark .border-amber-200 { border-color: rgba(250,204,21,0.25) !important; }
+
+/* Red (error) */
+.app-dark .bg-red-50     { background-color: rgba(239,68,68,0.1) !important; }
+.app-dark .bg-red-100    { background-color: rgba(239,68,68,0.15) !important; }
+.app-dark .text-red-600  { color: #f87171 !important; }
+.app-dark .text-red-700  { color: #f87171 !important; }
+.app-dark .border-red-200 { border-color: rgba(248,113,113,0.25) !important; }
+.app-dark .hover\:bg-red-100:hover { background-color: rgba(239,68,68,0.15) !important; }
+.app-dark .hover\:bg-red-50:hover  { background-color: rgba(239,68,68,0.1) !important; }
+.app-dark .hover\:text-red-700:hover { color: #f87171 !important; }
+
+/* Blue */
+.app-dark .bg-blue-50    { background-color: rgba(59,130,246,0.1) !important; }
+.app-dark .text-blue-700 { color: #60a5fa !important; }
+.app-dark .text-blue-600 { color: #60a5fa !important; }
+.app-dark .border-blue-200 { border-color: rgba(96,165,250,0.25) !important; }
+
+/* Violet/Purple */
+.app-dark .bg-violet-50  { background-color: rgba(139,92,246,0.1) !important; }
+.app-dark .text-violet-700 { color: #c4b5fd !important; }
+.app-dark .border-violet-200 { border-color: rgba(196,181,253,0.25) !important; }
+
+/* White/border combos */
+.app-dark .shadow-elevated { box-shadow: 0 4px 24px rgba(0,0,0,0.4) !important; }
+.app-dark .shadow-overlay  { box-shadow: 0 8px 40px rgba(0,0,0,0.5) !important; }
+.app-dark .shadow-card     { box-shadow: 0 0 0 1px rgba(255,255,255,0.08) !important; }
+
+/* ── Density system ──────────────────────────────────────────────────────────
+   :root declares comfortable defaults. AppLayout reads --content-padding and
+   --header-height via inline style var(). Tailwind classes are overridden below
+   using attribute-selector specificity (0,1,1) > plain class (0,1,0).
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Theme color channels (enables Tailwind opacity modifiers e.g. text-ink/70) */
+  --color-ink-rgb:    255 255 255;
+  --color-muted-rgb:  255 255 255;
+  --color-accent-rgb: 232 78 42;
+  --color-bg-rgb:     26 23 20;
+
+  /* ── Direct color values for CSS properties and inline styles */
+  --color-bg:            #1A1714;
+  --color-surface:       #3A3430;
+  --color-surface-2:     #131110;
+  --color-ink:           rgba(255, 255, 255, 0.90);
+  --color-muted:         rgba(255, 255, 255, 0.55);
+  --color-border:        rgba(255, 255, 255, 0.12);
+  --color-accent:        #E84E2A;
+  --color-accent-hover:  rgba(220, 60, 20, 0.95);
+  --color-accent-subtle: rgba(232, 78, 42, 0.12);
+  --color-hover-bg:      rgba(255, 255, 255, 0.06);
+
+  /* ── Density layout */
+  --content-padding: 32px;
+  --header-height:   56px;
+  --spacing-unit:    1;
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --color-ink-rgb:    26 16 64;
+  --color-muted-rgb:  123 111 160;
+  --color-accent-rgb: 107 78 255;
+  --color-bg-rgb:     238 234 248;
+
+  --color-bg:            #EEEAF8;
+  --color-surface:       #F5F3FF;
+  --color-surface-2:     #E8E4F5;   /* sidebar + header chrome */
+  --color-ink:           #1A1040;
+  --color-muted:         #7B6FA0;
+  --color-border:        #DDD8F0;
+  --color-accent:        #6B4EFF;
+  --color-accent-hover:  #5538EE;
+  --color-accent-subtle: rgba(107, 78, 255, 0.12);
+  --color-hover-bg:      rgba(107, 78, 255, 0.06);
+  --color-success:       #22c55e;
+  --color-danger:        #ef4444;
+}
+
+/* Page chrome — scoped to authenticated app pages via .app-dark.
+   Landing page (no .app-dark) is intentionally excluded so it stays dark. */
+[data-theme="light"] body:has(.app-dark),
+[data-theme="light"] #root:has(.app-dark) {
+  background-color: var(--color-bg) !important;
+  color: var(--color-ink) !important;
+}
+
+/* Light scrollbar */
+[data-theme="light"] ::-webkit-scrollbar-thumb       { background: rgba(0,0,0,0.15); }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+/* ── Reset .app-dark Tailwind overrides inside [data-theme="light"] ─────────
+   Each rule re-points to the CSS variable that now holds the light value.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+[data-theme="light"] .app-dark { background: var(--color-bg) !important; }
+
+/* Surfaces */
+[data-theme="light"] .app-dark .bg-surface      { background-color: var(--color-surface) !important; }
+[data-theme="light"] .app-dark .bg-surface\/40  { background-color: rgba(107,78,255,0.06) !important; }
+[data-theme="light"] .app-dark .bg-paper        { background-color: #FFFFFF !important; }
+[data-theme="light"] .app-dark .bg-paper\/20    { background-color: rgba(107,78,255,0.03) !important; }
+[data-theme="light"] .app-dark .bg-paper\/40    { background-color: rgba(107,78,255,0.05) !important; }
+[data-theme="light"] .app-dark .bg-paper\/60    { background-color: rgba(107,78,255,0.07) !important; }
+[data-theme="light"] .app-dark .bg-paper\/80    { background-color: rgba(107,78,255,0.09) !important; }
+
+/* Ink → accent in light mode (buttons, filled elements) */
+[data-theme="light"] .app-dark .bg-ink          { background-color: var(--color-accent) !important; }
+[data-theme="light"] .app-dark .bg-ink\/5       { background-color: rgba(107,78,255,0.05) !important; }
+[data-theme="light"] .app-dark .bg-ink\/8       { background-color: rgba(107,78,255,0.08) !important; }
+[data-theme="light"] .app-dark .bg-ink\/10      { background-color: rgba(107,78,255,0.10) !important; }
+[data-theme="light"] .app-dark .bg-ink\/20      { background-color: rgba(107,78,255,0.20) !important; }
+[data-theme="light"] .app-dark .hover\:bg-ink\/90:hover { background-color: var(--color-accent-hover) !important; }
+[data-theme="light"] .app-dark .hover\:bg-ink:hover     { background-color: var(--color-accent-hover) !important; }
+
+/* Borders */
+[data-theme="light"] .app-dark .border-border          { border-color: var(--color-border) !important; }
+[data-theme="light"] .app-dark .border-ink\/10         { border-color: rgba(107,78,255,0.10) !important; }
+[data-theme="light"] .app-dark .border-ink\/20         { border-color: rgba(107,78,255,0.18) !important; }
+[data-theme="light"] .app-dark .divide-border > * + *  { border-color: var(--color-border) !important; }
+[data-theme="light"] .app-dark .hover\:border-ink\/10:hover { border-color: rgba(107,78,255,0.25) !important; }
+[data-theme="light"] .app-dark .hover\:border-ink\/15:hover { border-color: rgba(107,78,255,0.30) !important; }
+[data-theme="light"] .app-dark .hover\:border-ink\/20:hover { border-color: rgba(107,78,255,0.35) !important; }
+
+/* Text */
+[data-theme="light"] .app-dark .text-ink           { color: var(--color-ink) !important; }
+[data-theme="light"] .app-dark .text-ink\/70       { color: rgba(26,16,64,0.70) !important; }
+[data-theme="light"] .app-dark .text-ink\/80       { color: rgba(26,16,64,0.80) !important; }
+[data-theme="light"] .app-dark .text-muted         { color: var(--color-muted) !important; }
+[data-theme="light"] .app-dark .text-muted\/60     { color: rgba(123,111,160,0.70) !important; }
+[data-theme="light"] .app-dark .text-surface       { color: #FFFFFF !important; }
+[data-theme="light"] .app-dark .hover\:text-ink:hover     { color: var(--color-ink) !important; }
+[data-theme="light"] .app-dark .hover\:text-ink\/80:hover { color: rgba(26,16,64,0.80) !important; }
+
+/* Hover surfaces */
+[data-theme="light"] .app-dark .hover\:bg-paper:hover     { background-color: rgba(107,78,255,0.05) !important; }
+[data-theme="light"] .app-dark .hover\:bg-paper\/60:hover { background-color: rgba(107,78,255,0.07) !important; }
+[data-theme="light"] .app-dark .hover\:bg-surface:hover   { background-color: rgba(107,78,255,0.08) !important; }
+[data-theme="light"] .app-dark .hover\:shadow-float       { box-shadow: 0 0 30px rgba(107,78,255,0.08) !important; }
+
+/* Focus rings */
+[data-theme="light"] .app-dark .focus\:ring-ink\/20:focus { --tw-ring-color: rgba(107,78,255,0.20) !important; }
+
+/* Charts */
+[data-theme="light"] .app-dark .recharts-cartesian-axis-tick text { fill: var(--color-muted) !important; }
+[data-theme="light"] .app-dark .recharts-cartesian-grid line      { stroke: var(--color-border) !important; }
+[data-theme="light"] .app-dark .recharts-legend-item-text        { color: var(--color-muted) !important; }
+
+/* Misc */
+[data-theme="light"] .app-dark mark { background-color: rgba(107,78,255,0.15) !important; color: var(--color-ink) !important; }
+
+/* Status colors adapted for light backgrounds */
+[data-theme="light"] .app-dark .bg-emerald-50     { background-color: rgba(34,197,94,0.12) !important; }
+[data-theme="light"] .app-dark .text-emerald-700  { color: #16a34a !important; }
+[data-theme="light"] .app-dark .text-emerald-600  { color: #16a34a !important; }
+[data-theme="light"] .app-dark .border-emerald-200 { border-color: rgba(22,163,74,0.30) !important; }
+[data-theme="light"] .app-dark .hover\:bg-emerald-100:hover { background-color: rgba(34,197,94,0.18) !important; }
+[data-theme="light"] .app-dark .hover\:text-emerald-800:hover { color: #15803d !important; }
+[data-theme="light"] .app-dark .bg-amber-50       { background-color: rgba(234,179,8,0.12) !important; }
+[data-theme="light"] .app-dark .text-amber-700    { color: #d97706 !important; }
+[data-theme="light"] .app-dark .text-amber-600    { color: #d97706 !important; }
+[data-theme="light"] .app-dark .border-amber-200  { border-color: rgba(217,119,6,0.30) !important; }
+[data-theme="light"] .app-dark .bg-red-50         { background-color: rgba(239,68,68,0.10) !important; }
+[data-theme="light"] .app-dark .bg-red-100        { background-color: rgba(239,68,68,0.16) !important; }
+[data-theme="light"] .app-dark .text-red-600      { color: #dc2626 !important; }
+[data-theme="light"] .app-dark .text-red-700      { color: #dc2626 !important; }
+[data-theme="light"] .app-dark .border-red-200    { border-color: rgba(220,38,38,0.25) !important; }
+[data-theme="light"] .app-dark .hover\:bg-red-50:hover  { background-color: rgba(239,68,68,0.10) !important; }
+[data-theme="light"] .app-dark .hover\:bg-red-100:hover { background-color: rgba(239,68,68,0.16) !important; }
+[data-theme="light"] .app-dark .hover\:text-red-700:hover { color: #dc2626 !important; }
+[data-theme="light"] .app-dark .bg-blue-50        { background-color: rgba(59,130,246,0.10) !important; }
+[data-theme="light"] .app-dark .text-blue-700     { color: #2563eb !important; }
+[data-theme="light"] .app-dark .text-blue-600     { color: #2563eb !important; }
+[data-theme="light"] .app-dark .border-blue-200   { border-color: rgba(37,99,235,0.25) !important; }
+[data-theme="light"] .app-dark .bg-violet-50      { background-color: rgba(139,92,246,0.10) !important; }
+[data-theme="light"] .app-dark .text-violet-700   { color: #7c3aed !important; }
+[data-theme="light"] .app-dark .border-violet-200 { border-color: rgba(124,58,237,0.25) !important; }
+
+/* Shadows */
+[data-theme="light"] .app-dark .shadow-elevated { box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important; }
+[data-theme="light"] .app-dark .shadow-overlay  { box-shadow: 0 8px 40px rgba(0,0,0,0.15) !important; }
+[data-theme="light"] .app-dark .shadow-card     { box-shadow: 0 0 0 1px var(--color-border) !important; }
+
+/* ── Orange → purple accent in light mode ────────────────────────────────────
+   ALL rules scoped to .app-dark so the always-dark landing page is unaffected.
+   data-theme is set on <html>; landing page has no .app-dark ancestor.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Backgrounds */
+[data-theme="light"] .app-dark .bg-\[\#E84E2A\]   { background-color: #6B4EFF !important; }
+[data-theme="light"] .app-dark .bg-accent         { background-color: #6B4EFF !important; }
+
+/* Text */
+[data-theme="light"] .app-dark .text-\[\#E84E2A\] { color: #6B4EFF !important; }
+[data-theme="light"] .app-dark .text-accent       { color: #6B4EFF !important; }
+
+/* Borders */
+[data-theme="light"] .app-dark .border-\[\#E84E2A\] { border-color: #6B4EFF !important; }
+
+/* Hover states */
+[data-theme="light"] .app-dark .hover\:bg-\[\#E84E2A\]:hover  { background-color: #5538EE !important; }
+[data-theme="light"] .app-dark .hover\:text-\[\#E84E2A\]:hover { color: #6B4EFF !important; }
+
+/* SVG fill / stroke */
+[data-theme="light"] .app-dark .fill-\[\#E84E2A\]  { fill: #6B4EFF !important; }
+[data-theme="light"] .app-dark .stroke-\[\#E84E2A\] { stroke: #6B4EFF !important; }
+
+/* Opacity variants */
+[data-theme="light"] .app-dark .bg-\[\#E84E2A\]\/10 { background-color: rgba(107,78,255,0.10) !important; }
+[data-theme="light"] .app-dark .bg-\[\#E84E2A\]\/20 { background-color: rgba(107,78,255,0.15) !important; }
+
+/* Buttons and anchors with explicit orange bg class */
+[data-theme="light"] .app-dark button.bg-\[\#E84E2A\],
+[data-theme="light"] .app-dark a.bg-\[\#E84E2A\]    { background-color: #6B4EFF !important; color: white !important; }
+
+/* Catch any button whose class attribute contains E84E2A */
+[data-theme="light"] .app-dark button[class*="E84E2A"] { background-color: #6B4EFF !important; color: white !important; }
+
+/* Inline-style button override */
+[data-theme="light"] .app-dark button[style*="E84E2A"] { background-color: #6B4EFF !important; }
+
+/* Broad inline-style override for any element inside the app */
+[data-theme="light"] .app-dark [style*="#E84E2A"]             { color: #6B4EFF !important; }
+[data-theme="light"] .app-dark [style*="background: #E84E2A"] { background-color: #6B4EFF !important; }
+[data-theme="light"] .app-dark [style*="color: #E84E2A"]      { color: #6B4EFF !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid #E84E2A"] { border-color: #6B4EFF !important; }
+
+[data-density="compact"] {
+  --content-padding: 20px;
+  --header-height:   44px;
+  --spacing-unit:    0.75;
+}
+
+/* Inputs ------------------------------------------------------------------ */
+[data-density="compact"] .px-3\.5 {
+  padding-left:  calc(0.875rem * var(--spacing-unit)) !important;
+  padding-right: calc(0.875rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .py-2\.5 {
+  padding-top:    calc(0.625rem * var(--spacing-unit)) !important;
+  padding-bottom: calc(0.625rem * var(--spacing-unit)) !important;
+}
+
+/* Buttons and interactive elements ---------------------------------------- */
+[data-density="compact"] .px-4 {
+  padding-left:  calc(1rem * var(--spacing-unit)) !important;
+  padding-right: calc(1rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .py-2 {
+  padding-top:    calc(0.5rem * var(--spacing-unit)) !important;
+  padding-bottom: calc(0.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .px-6 {
+  padding-left:  calc(1.5rem * var(--spacing-unit)) !important;
+  padding-right: calc(1.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .py-4 {
+  padding-top:    calc(1rem * var(--spacing-unit)) !important;
+  padding-bottom: calc(1rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .py-3 {
+  padding-top:    calc(0.75rem * var(--spacing-unit)) !important;
+  padding-bottom: calc(0.75rem * var(--spacing-unit)) !important;
+}
+
+/* Cards and containers ---------------------------------------------------- */
+[data-density="compact"] .p-6 {
+  padding: calc(1.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .p-5 {
+  padding: calc(1.25rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .p-4 {
+  padding: calc(1rem * var(--spacing-unit)) !important;
+}
+
+/* Stacked-list and grid gaps ---------------------------------------------- */
+[data-density="compact"] .space-y-6 > * + * {
+  margin-top: calc(1.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .space-y-4 > * + * {
+  margin-top: calc(1rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .space-y-3 > * + * {
+  margin-top: calc(0.75rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .gap-6 {
+  gap: calc(1.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .gap-4 {
+  gap: calc(1rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .gap-3 {
+  gap: calc(0.75rem * var(--spacing-unit)) !important;
+}
+
+/* Section margins --------------------------------------------------------- */
+[data-density="compact"] .mb-8 {
+  margin-bottom: calc(2rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .mb-6 {
+  margin-bottom: calc(1.5rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .mb-5 {
+  margin-bottom: calc(1.25rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .mt-8 {
+  margin-top: calc(2rem * var(--spacing-unit)) !important;
+}
+[data-density="compact"] .mt-6 {
+  margin-top: calc(1.5rem * var(--spacing-unit)) !important;
+}
+
+/* ── Light mode: sidebar active nav link ──────────────────────────────────── */
+/* React Router sets aria-current="page" on the active NavLink */
+[data-theme="light"] aside [aria-current="page"] {
+  background: #DDD8F0 !important;
+}
+
+/* ── Light mode: inline-style overrides ──────────────────────────────────────
+   CSS !important beats author inline styles, so [style*="..."] selectors with
+   !important correctly override hardcoded dark hex values in React components.
+   Targets specific values found in Dashboard.jsx and Upload.jsx.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* ── Dark card / container backgrounds — scoped to .app-dark ── */
+/* Dashboard stat cards */
+[data-theme="light"] .app-dark [style*="background: #332E2A"] {
+  background: #F5F3FF !important;
+  box-shadow: 0 1px 4px rgba(107,78,255,0.06), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+/* Dashboard document table + Upload recent-docs */
+[data-theme="light"] .app-dark [style*="background: #272320"],
+[data-theme="light"] .app-dark [style*="background: #2A2522"] {
+  background: #F5F3FF !important;
+}
+/* Dashboard table header row */
+[data-theme="light"] .app-dark [style*="background: #2E2A26"] {
+  background: #E8E4F5 !important;
+}
+/* Dashboard folder sidebar panel */
+[data-theme="light"] .app-dark [style*="background: #1E1B18"] {
+  background: #E8E4F5 !important;
+}
+/* Dashboard folder dropdown / delete modal */
+[data-theme="light"] .app-dark [style*="background: #1A1816"] {
+  background: #FFFFFF !important;
+}
+/* #2C2926 kept dark intentionally — Upload feature cards are accent-dark by design.
+   Compare.jsx handles its own panel bg via inline conditional styles. */
+
+/* ── Border overrides — scoped to .app-dark ── */
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.06)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.08)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.10)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.12)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.15)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.18)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 1px solid rgba(255,255,255,0.20)"] { border-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border: 2px dashed rgba(255,255,255,0.20)"] { border-color: #DDD8F0 !important; }
+
+[data-theme="light"] .app-dark [style*="border-bottom: 1px solid rgba(255,255,255,0.06)"] { border-bottom-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border-bottom: 1px solid rgba(255,255,255,0.08)"] { border-bottom-color: #DDD8F0 !important; }
+[data-theme="light"] .app-dark [style*="border-bottom: 1px solid rgba(255,255,255,0.12)"] { border-bottom-color: #DDD8F0 !important; }
+
+[data-theme="light"] .app-dark [style*="border-right: 1px solid rgba(255,255,255,0.15)"] { border-right-color: #DDD8F0 !important; }
+
+/* ── Transparent dark surfaces → light purple tints — scoped to .app-dark ── */
+[data-theme="light"] .app-dark [style*="background: rgba(255,255,255,0.02)"] { background: rgba(107,78,255,0.02) !important; }
+[data-theme="light"] .app-dark [style*="background: rgba(255,255,255,0.04)"] { background: rgba(107,78,255,0.03) !important; }
+[data-theme="light"] .app-dark [style*="background: rgba(255,255,255,0.05)"] { background: rgba(107,78,255,0.04) !important; }
+
+/* ── Inline-style text overrides — scoped to .app-dark ──────────────────────
+   Overrides hardcoded dark inline-style text colors in Dashboard, Upload etc.
+   Scoped to .app-dark so the always-dark landing page is never touched.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* White / near-white → dark ink */
+[data-theme="light"] .app-dark h1[style*="color: #FFFFFF"],
+[data-theme="light"] .app-dark h1[style*="color: white"],
+[data-theme="light"] .app-dark h2[style*="color: #FFFFFF"],
+[data-theme="light"] .app-dark h2[style*="color: white"],
+[data-theme="light"] .app-dark h3[style*="color: #FFFFFF"],
+[data-theme="light"] .app-dark h3[style*="color: white"]              { color: #1A1040 !important; }
+
+[data-theme="light"] .app-dark p[style*="color: #FFFFFF"],
+[data-theme="light"] .app-dark p[style*="color: white"]               { color: #1A1040 !important; }
+
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.90)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.85)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.80)"] { color: #1A1040 !important; }
+
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.92)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.85)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.80)"] { color: #1A1040 !important; }
+
+/* Semi-transparent white → muted palette */
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.75)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.70)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.65)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.60)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.55)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.50)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.45)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.40)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.35)"],
+[data-theme="light"] .app-dark p[style*="color: rgba(255,255,255,0.30)"]  { color: #7B6FA0 !important; }
+
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.70)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.65)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.50)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.45)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.40)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.35)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.30)"],
+[data-theme="light"] .app-dark span[style*="color: rgba(255,255,255,0.25)"] { color: #7B6FA0 !important; }
+
+[data-theme="light"] .app-dark div[style*="color: rgba(255,255,255,0.65)"],
+[data-theme="light"] .app-dark div[style*="color: rgba(255,255,255,0.40)"],
+[data-theme="light"] .app-dark div[style*="color: rgba(255,255,255,0.35)"],
+[data-theme="light"] .app-dark div[style*="color: rgba(255,255,255,0.30)"] { color: #7B6FA0 !important; }
+
+[data-theme="light"] .app-dark th[style*="color: rgba(255,255,255,0.75)"]  { color: #7B6FA0 !important; }
+
+[data-theme="light"] .app-dark td[style*="color: rgba(255,255,255,0.45)"],
+[data-theme="light"] .app-dark td[style*="color: rgba(255,255,255,0.25)"]  { color: #7B6FA0 !important; }
+
+[data-theme="light"] .app-dark button[style*="color: rgba(255,255,255,0.70)"],
+[data-theme="light"] .app-dark button[style*="color: rgba(255,255,255,0.60)"],
+[data-theme="light"] .app-dark button[style*="color: rgba(255,255,255,0.45)"],
+[data-theme="light"] .app-dark button[style*="color: rgba(255,255,255,0.40)"],
+[data-theme="light"] .app-dark button[style*="color: rgba(255,255,255,0.35)"] { color: #7B6FA0 !important; }
+
+/* ── Document table rows (by class name, set in Dashboard's <style> block) ── */
+[data-theme="light"] .doc-row {
+  border-bottom-color: #DDD8F0 !important;
+}
+[data-theme="light"] tr.doc-row:hover {
+  background: rgba(107,78,255,0.04) !important;
+}
+[data-theme="light"] tr.doc-header-row {
+  background: #E8E4F5 !important;
+  border-bottom-color: #DDD8F0 !important;
+}
+
+/* ── Checkbox ── */
+[data-theme="light"] .doc-checkbox {
+  border-color: rgba(123,111,160,0.45) !important;
+  background: transparent !important;
+}
+[data-theme="light"] .doc-checkbox:hover   { border-color: #6B4EFF !important; }
+[data-theme="light"] .doc-checkbox:checked {
+  background: #6B4EFF !important;
+  border-color: #6B4EFF !important;
+}
+
+/* ── Progress bar track — scoped to .app-dark ── */
+[data-theme="light"] .app-dark [style*="height: 2px"][style*="rgba(255,255,255,0.08)"],
+[data-theme="light"] .app-dark [style*="height: 3px"][style*="rgba(255,255,255,0.10)"] {
+  background: rgba(107,78,255,0.15) !important;
+}
+
+/* ── Scrollbar (light) ── */
+[data-theme="light"] ::-webkit-scrollbar-thumb       { background: rgba(107,78,255,0.2); }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(107,78,255,0.35); }
+
+/* ── Light mode: Recharts — scoped to .app-dark ──────────────────────────── */
+/* (Catches anything not covered by the .app-dark .recharts-* rules above) */
+
+[data-theme="light"] .app-dark .recharts-wrapper { background-color: transparent !important; }
+[data-theme="light"] .app-dark .recharts-cartesian-axis-tick-value { fill: #1A1040 !important; }
+[data-theme="light"] .app-dark .recharts-text    { fill: #1A1040 !important; }
+[data-theme="light"] .app-dark .recharts-layer   { background-color: transparent !important; }
+[data-theme="light"] .app-dark svg text          { fill: #1A1040 !important; }
+
+/* ── Light mode: text-class overrides — scoped to .app-dark ─────────────── */
+/* Keeps landing page white text (text-white, etc.) untouched. */
+
+[data-theme="light"] .app-dark [class*="text-white"]     { color: #1A1040 !important; }
+[data-theme="light"] .app-dark [class*="text-[#F5F2EC]"] { color: #1A1040 !important; }
+[data-theme="light"] .app-dark [class*="text-[#8C8A85]"] { color: #7B6FA0 !important; }
+[data-theme="light"] .app-dark [class*="text-[#A8A5A0]"] { color: #7B6FA0 !important; }
+
+/* ── Light mode: form inputs — scoped to .app-dark ──────────────────────── */
+
+[data-theme="light"] .app-dark input,
+[data-theme="light"] .app-dark textarea,
+[data-theme="light"] .app-dark select {
+  background-color: #FFFFFF !important;
+  color: #1A1040 !important;
+  border-color: #DDD8F0 !important;
+}
+[data-theme="light"] .app-dark input::placeholder,
+[data-theme="light"] .app-dark textarea::placeholder { color: #7B6FA0 !important; }
