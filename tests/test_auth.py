@@ -2,7 +2,8 @@
 
 
 def test_signup_returns_user_id_and_email(client):
-    r = client.post("/auth/signup", json={"email": "new@test.com", "password": "testpass123"})
+    # org_name is required for a fresh (non-invited) signup.
+    r = client.post("/auth/signup", json={"email": "new@test.com", "password": "testpass123", "org_name": "New Org"})
     assert r.status_code == 200
     body = r.json()
     assert body["email"] == "new@test.com"

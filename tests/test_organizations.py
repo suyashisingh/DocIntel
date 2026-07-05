@@ -4,6 +4,7 @@ import pytest
 from app.auth.jwt_handler import create_access_token
 from app.auth.security import hash_password
 from app.models.organization_user import OrgRole, OrganizationUser
+from app.models.pending_invite import PendingInvite
 from app.models.user import User
 
 
@@ -55,21 +56,23 @@ def test_create_organization_requires_authentication(client):
 # Invite member
 # ---------------------------------------------------------------------------
 
-def test_invite_member_as_admin_succeeds(client, org, admin_token, db):
+def test_invite_blocked_for_user_with_existing_account(client, org, admin_token, db):
+    # The invite flow only supports genuinely new emails (async signup via a
+    # PendingInvite + emailed link) — any email that already has a User row,
+    # org-less or not, is rejected rather than added directly.
     fresh = _make_user(db, "fresh@test.com")
     r = client.post(
         f"/organizations/{org.id}/invite",
         json={"email": fresh.email, "role": OrgRole.ANALYST},
         headers=_auth(admin_token),
     )
-    assert r.status_code == 200
-    assert r.json()["message"] == "User added to organization"
+    assert r.status_code == 400
+    assert "already registered with another organization" in r.json()["detail"]
 
     membership = db.query(OrganizationUser).filter_by(
         organization_id=org.id, user_id=fresh.id
     ).first()
-    assert membership is not None
-    assert membership.role == OrgRole.ANALYST
+    assert membership is None
 
 
 def test_invite_member_blocked_for_analyst(client, org, analyst_token, db):
@@ -92,13 +95,20 @@ def test_invite_member_blocked_for_viewer(client, org, viewer_token, db):
     assert r.status_code == 403
 
 
-def test_invite_nonexistent_user_returns_404(client, org, admin_token):
+def test_invite_nonexistent_user_returns_200_and_creates_pending_invite(client, org, admin_token, db):
+    # Inviting an email with no existing account queues an async, emailed
+    # signup invite rather than failing — no User row is created up front.
     r = client.post(
         f"/organizations/{org.id}/invite",
         json={"email": "ghost@test.com", "role": OrgRole.VIEWER},
         headers=_auth(admin_token),
     )
-    assert r.status_code == 404
+    assert r.status_code == 200
+    assert r.json()["message"] == "Invitation sent"
+
+    invite = db.query(PendingInvite).filter_by(org_id=org.id, email="ghost@test.com").first()
+    assert invite is not None
+    assert invite.role == OrgRole.VIEWER
 
 
 def test_invite_existing_member_returns_400(client, org, admin_token, analyst_user):
@@ -109,17 +119,23 @@ def test_invite_existing_member_returns_400(client, org, admin_token, analyst_us
         headers=_auth(admin_token),
     )
     assert r.status_code == 400
-    assert "already in organization" in r.json()["detail"]
+    assert "Already a member" in r.json()["detail"]
 
 
-def test_invite_invalid_role_returns_422(client, org, admin_token, db):
-    fresh = _make_user(db, "fresh4@test.com")
+def test_invite_accepts_any_nonempty_role_string(client, org, admin_token, db):
+    # OrganizationInvite.role is a plain, non-empty string (not an OrgRole/
+    # CustomRole-constrained enum) — the invite endpoint stores whatever
+    # value is sent verbatim without checking it against real role names.
     r = client.post(
         f"/organizations/{org.id}/invite",
-        json={"email": fresh.email, "role": "superuser"},
+        json={"email": "fresh4@test.com", "role": "superuser"},
         headers=_auth(admin_token),
     )
-    assert r.status_code == 422
+    assert r.status_code == 200
+
+    invite = db.query(PendingInvite).filter_by(org_id=org.id, email="fresh4@test.com").first()
+    assert invite is not None
+    assert invite.role == "superuser"
 
 
 # ---------------------------------------------------------------------------

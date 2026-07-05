@@ -18,7 +18,7 @@ def _auth(token: str) -> dict:
 def _upload(client, org_id: int, token: str):
     return client.post(
         f"/documents/{org_id}/upload",
-        files={"file": ("report.pdf", b"fake pdf content", "application/pdf")},
+        files={"files": ("report.pdf", b"fake pdf content", "application/pdf")},
         headers=_auth(token),
     )
 
@@ -30,7 +30,7 @@ def _upload(client, org_id: int, token: str):
 def test_upload_as_admin_succeeds(client, org, admin_token, mock_celery):
     r = _upload(client, org.id, admin_token)
     assert r.status_code == 200
-    body = r.json()
+    body = r.json()[0]  # endpoint accepts a list of files, always returns a list
     assert body["organization_id"] == org.id
     assert body["status"] == DocumentStatus.uploaded
     assert body["uploaded_by"] is not None
@@ -62,7 +62,7 @@ def test_upload_blocked_for_non_member(client, org, db):
 
 def test_upload_queues_celery_task(client, org, admin_token, mock_celery):
     r = _upload(client, org.id, admin_token)
-    doc_id = r.json()["id"]
+    doc_id = r.json()[0]["id"]
     mock_celery.delay.assert_called_once_with(doc_id)
 
 
