@@ -2,8 +2,7 @@
 
 A multi-tenant SaaS platform for AI-powered document processing, extraction, search, and analysis — built as a final-year capstone project (BTech IT, Manipal Institute of Technology), developed in the context of an internship at Valuefy Technologies Pvt. Ltd., Mumbai.
 
-**Live demo:** [https://doc-intel-azure.vercel.app](https://doc-intel-azure.vercel.app)
-**Backend API docs:** [https://docintel-3qo8.onrender.com/docs](https://docintel-3qo8.onrender.com/docs)
+
 
 > ⚠️ **Note on the live demo:** This is hosted entirely on free-tier infrastructure (Render + Neon + Upstash) to keep the project cost-free. The backend container is capped at 512MB RAM, which is tight for the ML models this app runs (embeddings, document classification) alongside FastAPI itself. As a result:
 > - The backend may take 30-60 seconds to respond on the first request after a period of inactivity (free-tier cold start).
